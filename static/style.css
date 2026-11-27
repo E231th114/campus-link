@@ -83,3 +83,36 @@ main > a:first-child { display: inline-block; margin-bottom: 14px; font-size: 14
   button,.button,summary { min-height: 44px }
   h1 { margin-bottom: 16px }
 }
+
+[hidden], .bottom-nav { display: none !important }
+#filter-options,.sheet-heading { display: flex; align-items: center; gap: 12px }
+#filter-sheet { width: min(100%,480px); max-width: 100%; max-height: 85dvh; box-sizing: border-box; margin: auto auto 0; border: 0; border-radius: 14px 14px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); color: var(--ink) }
+#filter-sheet::backdrop { background: rgb(0 0 0 / .32) }
+.sheet-heading { justify-content: space-between }
+.sheet-heading h2 { margin: 0 }
+#sheet-fields #filter-options { display: grid; margin: 20px 0 }
+#sheet-fields select,#sheet-fields label { min-height: 44px; font-size: 16px; display: flex; align-items: center }
+#apply-filters { width: 100% }
+#image-preview { width: auto; max-width: 100%; max-height: 240px }
+.excerpt { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden }
+@media(max-width:760px) {
+  body { min-height: 100dvh; padding-bottom: calc(70px + env(safe-area-inset-bottom)) }
+  .bar { height: 50px; padding-inline: max(16px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-right)) }
+  header { padding-top: env(safe-area-inset-top) }
+  .bar .button,.categories:not(.list-nav) { display: none }
+  .categories:not(.list-nav) + main { padding-top: 18px }
+  .bottom-nav { display: grid !important; position: fixed; inset: auto 0 0; z-index: 6; grid-template-columns: repeat(5,minmax(0,1fr)); margin: 0; gap: 0; background: white; border: 0; border-top: 1px solid var(--line); padding: 3px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) }
+  .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 56px; padding: 0; font-size: 11px; line-height: 1.25 }
+  .bottom-nav svg { width: 24px; height: 24px; padding: 2px; stroke: currentColor; stroke-width: 1.65; fill: none; stroke-linejoin: round; stroke-linecap: round }
+  .bottom-nav [aria-current] { color: #111; font-weight: 750; border-top: 2px solid }
+  .bottom-nav .dest-new svg { color: white; background: #171717; border-radius: 6px; padding: 4px }
+  .keyboard-open .bottom-nav { display: none !important }
+  .categories nav a,main a:not(.post-row a),.filters button { min-width: 44px }
+  main > a, .empty a,.filters > a { display: inline-flex; min-height: 44px; align-items: center }
+  .post-row { padding-block: 14px }
+  .stack { max-width: none }
+  textarea,input { scroll-margin-block: 64px 90px }
+  .stack button.button { width: 100% }
+  a:active,button:active { background-color: #ddd; color: #111 }
+}
+@media(prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }

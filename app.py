@@ -63,7 +63,7 @@ def protect():
 @app.after_request
 def headers(response):
     response.headers.update({"X-Content-Type-Options": "nosniff", "Referrer-Policy": "same-origin",
-                             "Content-Security-Policy": "default-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"})
+                             "Content-Security-Policy": "default-src 'self'; img-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"})
     return response
 
 
@@ -101,6 +101,7 @@ def index():
     category = request.args.get("category", "")
     query = request.args.get("q", "").strip().casefold()
     rows = [p for p in posts if (not category or p["category"] == category)
+            and (request.args.get("view") != "mine" or p.get("owner") == session["owner"])
             and query in (p["title"] + " " + p["text"]).casefold()
             and (not request.args.get("unanswered") or not p["answers"] and not p["solved"])]
     popular = request.args.get("sort") == "popular"
@@ -149,7 +150,7 @@ def post():
         storage().picture(key, image)
     storage().add("board", key, dict(title=title, name=name, text=body, category=category,
                                     owner=session["owner"], posted_at=timestamp(), image=bool(image)))
-    flash("投稿を公開しました。")
+    flash("投稿を公開しました。", "posted")
     return redirect(url_for("detail", key=key), 303)
 
 
@@ -188,7 +189,8 @@ def act(key, action):
     if action == "deleted":
         flash("投稿を削除しました。")
         return redirect(url_for("index"), 303)
-    flash(("受け付けました。" if added else "すでに受け付けています。"))
+    flash("受け付けました。" if added else "すでに受け付けています。",
+          "answered" if action == "comment" else "message")
     return redirect(url_for("detail", key=key), 303)
 
 

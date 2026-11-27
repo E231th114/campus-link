@@ -1,9 +1,9 @@
 {% extends 'base.html' %}{% block title %}新規投稿{% endblock %}{% block body %}
-<a href="/">← 掲示板に戻る</a><h1>新しい投稿</h1>
-<form class="panel stack" method="post" action="/post" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{session.csrf}}">
+<a data-list-back href="/">← 掲示板に戻る</a><h1>新しい投稿</h1>
+<form data-draft="post" class="panel stack" method="post" action="/post" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{session.csrf}}">
 <label>カテゴリ<select name="category">{% for c in categories %}<option>{{c}}</option>{% endfor %}</select></label>
 <label>タイトル<input required maxlength="80" name="title" placeholder="どんなことを聞きたいですか？"></label>
 <label>本文<textarea required maxlength="3000" name="message" rows="7"></textarea></label>
 <label>ニックネーム（任意）<input maxlength="24" name="name" placeholder="名無し"></label>
-<label>画像（任意・JPEG / PNG・5 MBまで）<input type="file" name="image" accept="image/jpeg,image/png"></label><output id="file-info" aria-live="polite"></output>
-<p class="notice">本名、学校名、住所、電話番号や顔が写った写真は公開しないでください。</p><button class="button">投稿する</button></form>{% endblock %}
+<label>画像（任意・JPEG / PNG・5 MBまで）<input type="file" name="image" accept="image/jpeg,image/png"></label><img id="image-preview" alt="選択した画像" hidden><button type="button" id="remove-image" hidden>画像を外す</button><output id="file-info" aria-live="polite"></output>
+<p class="notice">本名、学校名、住所、電話番号や顔が写った写真は公開しないでください。</p><small>入力中の文字はこの端末のタブに一時保存されます。画像は画面を離れると再選択が必要です。</small><button class="button">投稿する</button></form>{% endblock %}

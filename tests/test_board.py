@@ -45,6 +45,8 @@ class BoardTest(unittest.TestCase):
             self.assertEqual(len(self.store.rows("like")), 1)
             other = board.app.test_client()
             other.get("/")
+            self.assertIn("&lt;math&gt;", self.client.get("/?view=mine").text)
+            self.assertNotIn("&lt;math&gt;", other.get("/?view=mine").text)
             with other.session_transaction() as session:
                 token = session["csrf"]
             self.assertEqual(other.post(path + "/resolved", data={"csrf": token}).status_code, 403)
