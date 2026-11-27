@@ -5,5 +5,5 @@
 <label>タイトル<input required maxlength="80" name="title" placeholder="どんなことを聞きたいですか？"></label>
 <label>本文<textarea required maxlength="3000" name="message" rows="7"></textarea></label>
 <label>ニックネーム（任意）<input maxlength="24" name="name" placeholder="名無し"></label>
-<label>画像（任意・JPEG / PNG・5 MBまで）<input type="file" name="image" accept="image/jpeg,image/png"></label>
+<label>画像（任意・JPEG / PNG・5 MBまで）<input type="file" name="image" accept="image/jpeg,image/png"></label><output id="file-info" aria-live="polite"></output>
 <p class="notice">本名、学校名、住所、電話番号や顔が写った写真は公開しないでください。</p><button class="button">投稿する</button></form>{% endblock %}
