@@ -50,6 +50,10 @@ class BoardTest(unittest.TestCase):
             self.assertEqual(other.post(path + "/resolved", data={"csrf": token}).status_code, 403)
             self.assertEqual(self.submit(path + "/resolved").status_code, 303)
             self.assertEqual(self.submit(path + "/comment", message="回答").status_code, 409)
+            self.assertEqual(other.post(path + "/deleted", data={"csrf": token}).status_code, 403)
+            self.assertEqual(self.submit(path + "/deleted").status_code, 303)
+            self.assertEqual(self.client.get(path).status_code, 404)
+            self.assertEqual(self.client.get(path.replace("/p/", "/image/")).status_code, 404)
             self.assertEqual(Local(self.store.root).rows("board")[0]["text"], "数学の復習")
 
     def test_validation(self):
@@ -61,4 +65,5 @@ class BoardTest(unittest.TestCase):
             clock.time.return_value = 10000
             self.assertEqual(self.submit("/post", message="質問").status_code, 303)
             self.assertEqual(self.submit("/post", message="質問").status_code, 429)
-        self.assertEqual(self.client.get("/static/index.html").status_code, 200)
+        with self.client.get("/static/index.html") as response:
+            self.assertEqual(response.status_code, 200)

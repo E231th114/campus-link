@@ -78,12 +78,13 @@ def rate_limit():
     # One write per address per ten-second interval, shared across workers.
     address = request.remote_addr or ""
     digest = hmac.new(app.secret_key.encode(), address.encode(), hashlib.sha256).hexdigest()
-    if not storage().add("rate", f"{int(time.time()) // 10}-{digest}", {}):
+    if not storage().add("rate", f"{int(time.time()) // 10}-{request.view_args.get('action', 'post')}-{digest}", {}):
         abort(429)
 
 
 def board():
-    posts = storage().rows("board")
+    deleted = {r["post"] for r in storage().rows("deleted")}
+    posts = [p for p in storage().rows("board") if p["RowKey"] not in deleted]
     counts = {part: Counter(row["post"] for row in storage().rows(part))
               for part in ("comment", "like", "resolved")}
     for p in posts:
@@ -174,7 +175,7 @@ def act(key, action):
             abort(409)
         data.update(text=field("message", 2000), name=field("name", 24, "名無し"), posted_at=timestamp())
         row = str(uuid.uuid4())
-    elif action == "resolved":
+    elif action in ("resolved", "deleted"):
         if p.get("owner") != session["owner"]:
             abort(403)
         row = key
@@ -184,6 +185,9 @@ def act(key, action):
         abort(404)
     rate_limit()
     added = storage().add(action, row, data)
+    if action == "deleted":
+        flash("投稿を削除しました。")
+        return redirect(url_for("index"), 303)
     flash(("受け付けました。" if added else "すでに受け付けています。"))
     return redirect(url_for("detail", key=key), 303)
 
