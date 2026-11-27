@@ -40,6 +40,6 @@
 | 画像 | JPEG・PNGを添付して詳細で表示 | 発展 |
 | Azure連携 | Tableに投稿・回答、非公開Blobに画像を保存する構成 | 発展 |
 
-サイトのURL：Azure公開前
+サイトのURL：https://ih12a19-00-g2asgpfbhxc9guga.eastasia-01.azurewebsites.net/（App Service初期Welcomeページを確認。Campus Link公開は未確認）
 
 GitHubリポジトリのURL：https://github.com/E231th114/campus-link
