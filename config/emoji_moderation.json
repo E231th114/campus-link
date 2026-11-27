@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "id": "middle-finger",
+      "codepoints": ["1F595"],
+      "reason": "相手への侮辱を明示するジェスチャー",
+      "enabled": true,
+      "updated_at": "2026-11-27"
+    }
+  ],
+  "hidden_by_post": {}
+}

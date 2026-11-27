@@ -13,7 +13,8 @@ from azure.core.exceptions import AzureError
 from flask import Flask, abort, flash, redirect, render_template, request, send_file, session, url_for
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from services.discussion import EMOJI, availability, parse_deadline, reaction_state
+from services.emoji import CATALOG, RECOMMENDED, allowed_code
+from services.discussion import availability, parse_deadline, reaction_state
 from services.store import Azure, Local
 
 CATEGORIES = ("勉強", "課題", "進路", "部活動", "相談", "雑談")
@@ -175,7 +176,7 @@ def detail(key):
     p = find_post(key)
     comments = sorted((r for r in storage().rows("comment") if r["post"] == str(key)),
                       key=lambda r: (r["posted_at"], r["RowKey"]))
-    return render_template("detail.html", p=p, comments=comments, emoji=EMOJI,
+    return render_template("detail.html", p=p, comments=comments, catalog=CATALOG,
                            reactions=reaction_state(storage(), str(key), session["owner"]))
 
 
@@ -201,18 +202,28 @@ def deadline_settings(key):
     return redirect(url_for("detail", key=key), 303)
 
 
+@app.get("/p/<uuid:key>/emoji-catalog")
+def emoji_catalog(key):
+    find_post(key)
+    post = str(key)
+    return {"items": [[code, *entry] for code, entry in CATALOG.items() if allowed_code(code, post)],
+            "recommended": [code for code in RECOMMENDED if allowed_code(code, post)]}
+
+
 @app.post("/p/<uuid:key>/emoji")
 def emoji_change(key):
     find_post(key)
     key = str(key)
-    code = request.form.get("emoji", "")
+    code = allowed_code(request.form.get("emoji", ""), key)
+    if not code:
+        return {"error": "この絵文字はCampus Linkでは使用できません。"}, 400
     active = request.form.get("active")
     revision = request.form.get("revision", type=int)
-    if code not in EMOJI or active not in ("0", "1") or revision is None or revision < 0:
+    if active not in ("0", "1") or revision is None or revision < 0:
         abort(400)
     owner = session["owner"]
     state = reaction_state(storage(), key, owner)
-    current = state[code]
+    current = state.get(code, {"revision": 0, "mine": False})
     # Apply desired membership only against the version the user actually saw.
     if current["revision"] == revision and current["mine"] != (active == "1"):
         address = (request.remote_addr or "").encode()
@@ -247,6 +258,12 @@ def act(key, action):
         row = key
     elif action in ("like", "report"):
         row = key + "-" + session["owner"]
+        if action == "report" and request.form.get("reported_emoji"):
+            code = allowed_code(request.form["reported_emoji"], key)
+            if not code or not reaction_state(storage(), key, session["owner"]).get(code, {}).get("count"):
+                abort(400)
+            data["emoji"] = code
+            row += "-" + code
     else:
         abort(404)
     rate_limit()

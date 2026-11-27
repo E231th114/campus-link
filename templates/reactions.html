@@ -1,8 +1,17 @@
-<div class="emoji-bar" data-api="{{url_for('emoji_change',key=p.RowKey)}}" data-csrf="{{session.csrf}}">
+<div class="emoji-bar" data-api="{{url_for('emoji_change',key=p.RowKey)}}" data-catalog="{{url_for('emoji_catalog',key=p.RowKey)}}" data-csrf="{{session.csrf}}">
 <button type="button" id="emoji-open" aria-haspopup="dialog">＋ リアクション</button>
-{% for code,(glyph,label) in emoji.items() %}
-<button type="button" class="emoji-chip" data-code="{{code}}" aria-label="{{label}} {{reactions[code].count}}件" aria-pressed="{{ 'true' if reactions[code].mine else 'false' }}" {% if not reactions[code].count %}hidden{% endif %}>{{glyph}} <span>{{reactions[code].count}}</span></button>
-{% endfor %}
+{% for code,value in reactions.items() %}{% if value.count %}
+<button type="button" class="emoji-chip" data-code="{{code}}" aria-label="{{catalog[code][1]}} {{value.count}}件" aria-pressed="{{ 'true' if value.mine else 'false' }}">{{catalog[code][0]}} <span>{{value.count}}</span></button>
+{% endif %}{% endfor %}
+<script type="application/json" id="emoji-state">{{reactions|tojson}}</script>
 <dialog id="emoji-picker" aria-labelledby="emoji-title"><div class="sheet-heading"><h2 id="emoji-title">リアクションを選択</h2><button type="button" id="emoji-close">閉じる</button></div>
-<div class="emoji-grid">{% for code,(glyph,label) in emoji.items() %}<button type="button" data-code="{{code}}" data-revision="{{reactions[code].revision}}" data-label="{{label}}" aria-label="{{label}}" title="{{label}}" aria-pressed="{{ 'true' if reactions[code].mine else 'false' }}">{{glyph}}</button>{% endfor %}</div></dialog>
+<label>絵文字・名前で検索<input id="emoji-query" type="search" placeholder="絵文字を貼り付けるか英語名を入力"></label>
+<label>一覧<select id="emoji-group"></select></label>
+<div class="emoji-grid"></div><button type="button" id="emoji-more" hidden>さらに表示</button>
+<small id="picker-note" role="status"></small>
+<details id="emoji-report" hidden><summary>リアクションを通報</summary>
+<form method="post" action="{{url_for('act', key=p.RowKey, action='report')}}">
+<input type="hidden" name="csrf" value="{{session.csrf}}">
+<label>対象の絵文字<select name="reported_emoji"></select></label><button>通報する</button>
+</form></details></dialog>
 </div><small role="status" id="emoji-feedback"></small>

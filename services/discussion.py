@@ -1,15 +1,11 @@
 """Deadline policy and the allowed reaction vocabulary."""
+from services.emoji import RECOMMENDED, allowed_code
+
 import math
 from datetime import datetime, timedelta, timezone
 
 JST = timezone(timedelta(hours=9))
 PRESETS = {"1h": 3600, "24h": 86400, "3d": 259200, "1w": 604800}
-EMOJI = {
-    "heart": ("❤️", "共感した"), "cheer": ("🙌", "応援"),
-    "idea": ("💡", "なるほど"), "thanks": ("😊", "ありがとう"),
-    "watch": ("👀", "気になる"), "party": ("🎉", "おめでとう"),
-    "think": ("🤔", "考え中"), "clap": ("👏", "すごい"),
-}
 
 
 def parse_deadline(mode, custom, now):
@@ -52,12 +48,16 @@ def reaction_state(store, key, viewer):
     # Immutable revisions make a repeated or late request for the same revision harmless.
     latest = {}
     for row in store.rows("emoji-" + key):
-        pair = (row["owner"], row["emoji"])
+        code = allowed_code(row["emoji"], key)
+        if not code:
+            continue
+        pair = (row["owner"], code)
         if pair not in latest or row["revision"] > latest[pair]["revision"]:
             latest[pair] = row
-    state = {code: {"count": 0, "mine": False, "revision": 0} for code in EMOJI}
+    state = {code: {"count": 0, "mine": False, "revision": 0} for code in RECOMMENDED if allowed_code(code, key)}
     for (owner, code), row in latest.items():
-        if code in state:
+        if row["active"] or owner == viewer:
+            state.setdefault(code, {"count": 0, "mine": False, "revision": 0})
             state[code]["count"] += int(row["active"])
             if owner == viewer:
                 state[code].update(mine=row["active"], revision=row["revision"])
