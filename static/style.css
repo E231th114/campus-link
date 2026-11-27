@@ -52,6 +52,7 @@ article { padding-block: 19px; border-bottom: 1px solid var(--line) }
 .avatar { display: inline-grid; place-items: center; width: 22px; height: 22px; background: var(--surface); border-radius: 50%; font-size: 12px }
 .empty { border: 0; padding-block: 54px }
 .empty p,.notice { font-size: 14px }
+.demo-notice { margin: -12px 0 18px; font-size: 13px; color: var(--muted) }
 .stack { max-width: 680px; margin-top: 24px; display: grid; gap: 16px }
 .stack label { display: grid; gap: 6px; font-size: 14px; font-weight: 550 }
 .stack,.stack label { grid-template-columns: minmax(0,1fr) }

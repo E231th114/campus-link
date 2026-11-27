@@ -33,11 +33,19 @@ class Local:
             return [dict(json.loads(data), RowKey=key) for key, data in
                     db.execute("SELECT key,data FROM rows WHERE part=?", (part,))]
 
+    def delete(self, part, key):
+        with closing(sqlite3.connect(self.db)) as db, db:
+            db.execute("DELETE FROM rows WHERE part=? AND key=?", (part, key))
+
     def picture(self, key, data=None):
         file = self.root / (key + ".jpg")
         if data is None:
             return file.read_bytes()
         file.write_bytes(data)
+
+    def delete_picture(self, key):
+        file = self.root / (key + ".jpg")
+        file.unlink(missing_ok=True)
 
 
 class Azure:
@@ -67,6 +75,12 @@ class Azure:
     def rows(self, part):
         return list(self.table.query_entities("PartitionKey eq @part", parameters={"part": part}))
 
+    def delete(self, part, key):
+        try:
+            self.table.delete_entity(partition_key=part, row_key=key)
+        except ResourceNotFoundError:
+            pass
+
     def picture(self, key, data=None):
         blob = self.blobs.get_blob_client(key + ".jpg")
         if data is None:
@@ -75,3 +89,9 @@ class Azure:
             except ResourceNotFoundError as exc:
                 raise FileNotFoundError from exc
         blob.upload_blob(data)
+
+    def delete_picture(self, key):
+        try:
+            self.blobs.delete_blob(key + ".jpg")
+        except ResourceNotFoundError:
+            pass

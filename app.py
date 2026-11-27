@@ -113,7 +113,8 @@ def index():
             and (not request.args.get("unanswered") or not p["answers"] and p["accepting"])]
     popular = request.args.get("sort") == "popular"
     rows.sort(key=lambda p: (p["likes"] if popular else 0, p["posted_at"], p["RowKey"]), reverse=True)
-    return render_template("index.html", posts=rows, categories=CATEGORIES, category=category)
+    return render_template("index.html", posts=rows, categories=CATEGORIES, category=category,
+                           demo_present=any(p.get("demo") for p in posts))
 
 
 @app.get("/guide")
