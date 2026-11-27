@@ -109,6 +109,11 @@ def index():
     return render_template("index.html", posts=rows, categories=CATEGORIES, category=category)
 
 
+@app.get("/guide")
+def guide():
+    return render_template("guide.html")
+
+
 @app.get("/new")
 def new():
     return render_template("new.html", categories=CATEGORIES)

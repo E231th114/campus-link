@@ -130,3 +130,9 @@ main > a:first-child { display: inline-block; margin-bottom: 14px; font-size: 14
 #category-sheet nav small { display: none }
 #category-sheet nav a { min-height: 48px; justify-content: space-between; padding-inline: 4px; font-size: 16px; box-shadow: none; background: transparent }
 @media(max-width:760px) { .categories.list-nav { padding-block: 4px 10px } }
+
+.header-actions { display:flex; align-items:center; gap:8px }
+.help-link,.guide-nav-link { display:inline-flex; align-items:center; min-height:44px }
+.help-link { justify-content:center; width:44px }
+.guide-nav-link { margin:16px 10px; font-size:14px }
+@media(max-width:760px){.guide-nav-link{display:none}}

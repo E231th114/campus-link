@@ -48,3 +48,9 @@ python -m flask --app app run --port 5187
 ## 動作確認
 
 `python -m unittest discover -s tests -v`。SQLite で投稿・再読込、画像、回答、絞り込み、権限、解決済み、CSRF、連続送信、入力エラーを検証する。開発時に Azurite で Table の追加・照会と Blob のアップロード・取得も確認した。Azure 実環境の認証・権限・デプロイは未検証。
+
+## 使い方ガイド
+
+ヘッダーの「？」またはPCの「使い方ガイド」から `/guide` を開けます。端末別の手順、架空のデータで撮影した画面例、FAQを収録しています。練習の進行位置は同じタブに保存され、掲示板への書き込みは発生しません。
+
+UI変更時には templates/guide.html のボタン名と手順、static/guide/ の画像と番号、static/guide.js の練習内容を合わせて更新してください。

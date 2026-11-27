@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% set chapters = [('overview','画面の見方'),('find','投稿を探す'),('write','新しく投稿する'),('reply','回答とリアクション'),('manage','解決・削除・通報'),('safe','安全に使う'),('practice','練習する'),('faq','よくある質問')] %}
+{% macro contents() %}
+<ul>{% for id,label in chapters %}<li><a href="#{{id}}">{{label}}</a></li>{% endfor %}</ul>
+{% endmacro %}
+{% macro device(phone,pc) %}<span class="for-phone">{{phone}}</span><span class="for-pc">{{pc}}</span>{% endmacro %}
+{% macro screen(name,caption) %}
+<figure class="guide-shot">
+{% for mode,label in [('phone','スマートフォン'),('pc','PC')] %}
+<img class="for-{{mode}}" loading="lazy" width="{{390 if mode=='phone' else 1024}}" height="{{740 if mode=='phone' else 690}}" src="/static/guide/{{mode}}-{{name}}.png" alt="{{label}}の実画面。{{caption}}">
+{% endfor %}
+<figcaption>{{caption}}</figcaption></figure>
+{% endmacro %}
+{% block title %}使い方ガイド{% endblock %}
+{% block sidebar %}<aside class="guide-index"><details><summary>目次</summary>{{contents()}}</details><div class="desktop-index"><strong>目次</strong>{{contents()}}</div></aside>{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="/static/guide.css"><script defer src="/static/guide.js"></script>
+<div class="manual">
+<a href="/">← 掲示板に戻る</a>
+<h1>使い方ガイド</h1>
+<p>Campus Linkは、高校生が勉強や部活動、学校生活の疑問を持ち寄る掲示板です。まず気になる投稿をひとつ開いてみましょう。</p>
+<fieldset class="device-picker"><legend>見たい画面を選ぶ</legend><label><input type="radio" name="device" value="phone">スマートフォン</label><label><input type="radio" name="device" value="pc">PC</label></fieldset>
+<section id="overview"><h2>画面の見方</h2>
+<p>{{device('画面下の「ホーム」で一覧、「検索」でキーワード入力、「新規投稿」で投稿フォームを開けます。「未回答」はまだ回答のない受付中の投稿、「自分の投稿」はこのブラウザから書いた投稿です。','左側でカテゴリを選び、中央で投稿を読みます。右上の「投稿する」から質問を書けます。ロゴを選ぶと一覧に戻ります。')}}</p>
+{{screen('board','① カテゴリ　② キーワード検索　③ 投稿タイトル')}}
+<h3>投稿を読む</h3><ol><li>一覧でタイトルと回答数を見て、読みたい投稿を選びます。</li><li>詳細画面で本文・添付画像・回答を読みます。「掲示板に戻る」で一覧に戻れます。</li></ol></section>
+<section id="find"><h2>投稿を探す</h2>
+<h3>カテゴリを選ぶ</h3><ol><li>{{device('一覧の上にある「すべての投稿」または現在のカテゴリ名を押します。','左側のカテゴリ一覧を見ます。')}}</li><li>「勉強」などの名前を選ぶと、そのカテゴリの投稿だけが表示されます。「すべての投稿」でカテゴリ指定を外せます。</li></ol>
+<details class="for-phone"><summary>カテゴリを選ぶ画面を見る</summary><img class="phone-shot" src="/static/guide/phone-category.png" loading="lazy" width="390" height="740" alt="下から開いたカテゴリ一覧。①の「勉強」を押すと選択できます。"></details>
+<h3>キーワードで検索する</h3><ol><li>一覧の「キーワードで投稿を探す」に「テスト」などの言葉を入力します。</li><li>「検索」を押すと、タイトルや本文にその言葉を含む投稿が表示されます。見つからないときは短い言葉でも試してみましょう。</li></ol>
+<h3>未回答や人気順で絞る</h3><ol><li>{{device('検索欄の下の「絞り込み」を押します。','一覧の検索欄の横で条件を選びます。')}}</li><li>「未回答」にチェックするか、「新着順」を「人気順」に変えます。</li><li>{{device('「適用する」を押します。','「検索」を押します。')}} 条件に合った一覧に変わります。「条件を解除」で全体の一覧に戻れます。</li></ol>
+<details class="for-phone"><summary>絞り込みの画面を見る</summary><img class="phone-shot" src="/static/guide/phone-filters.png" loading="lazy" width="390" height="740" alt="① 並び順などを選び、② 適用するを押します。"></details></section>
+<section id="write"><h2>新しく投稿する</h2>
+<ol><li>{{device('画面下中央の「新規投稿」を押します。','右上の「投稿する」を押します。')}}</li><li>カテゴリを選び、タイトルに質問、本文に困っていることを書きます。ニックネームは空欄でも構いません。</li><li>公開してよい内容か読み返し、フォームの「投稿する」を押します。「投稿を公開しました。」と表示され、自分の投稿の詳細が開きます。</li></ol>
+{{screen('compose','① タイトル　② 本文。欄の下で文字数を確認できます。')}}
+<h3>画像を添付する</h3><ol><li>送信する前にフォームの「画像」欄で、5 MB以下のJPEGまたはPNGを選びます。</li><li>画像の見本を確認します。外したいときは「画像を外す」を押します。</li><li>投稿すると詳細画面で画像を見られます。画像は下書きに残らないため、画面を離れたら選び直してください。</li></ol></section>
+<section id="reply"><h2>回答とリアクション</h2>
+<h3>回答を書く</h3><ol><li>「回答受付中」の投稿を開き、回答欄まで移動します。</li><li>回答を書き、「回答する」を押します。投稿の下に回答が加わります。解決済みの投稿は読むことができます。</li></ol>
+<h3>参考になったことを伝える</h3><ol><li>役に立った投稿の本文の下で「参考になった」を押します。</li><li>ボタンの件数を確認します。同じブラウザで繰り返し押しても件数は増えません。</li></ol>
+{{screen('detail','① 参考になった　② 投稿者だけが使える削除の入口')}}
+</section>
+<section id="manage"><h2>解決・削除・通報</h2>
+<h3>自分の質問を解決済みにする</h3><ol><li>投稿したときと同じブラウザで、自分の投稿を開きます。</li><li>本文の下の「解決済みにする」を押します。表示が「解決済み」に変わり、新しい回答の受付が終わります。</li></ol>
+<h3>自分の投稿を削除する</h3><ol><li>自分の投稿で「投稿を削除」を開き、確認文を読みます。この時点なら閉じて取り消せます。</li><li>「削除を確定する」を押すと一覧に戻り、本文・回答・画像が掲示板から見えなくなります。</li></ol>
+<h3>不適切な投稿を知らせる</h3><ol><li>対象の投稿を開き、本文の下の「通報する」を押します。</li><li>「受け付けました。」と表示されると通報が記録されます。通報しただけで投稿が消えることはありません。</li></ol></section>
+<section id="safe"><h2>安全に使う</h2><p>送信前に、本名・学校名・住所・電話番号が入っていないか確認しましょう。写真の名札や背景にも注意してください。ほかの人の情報も同じように守りましょう。</p><p>投稿・回答の文字はこの端末のタブに一時保存されます。共用端末では書きかけの個人情報を残さないようにしましょう。</p></section>
+<section id="practice"><h2>練習する</h2><p>架空の質問を使って、カテゴリ選択からリアクションまでを試せます。練習の内容は掲示板に送信されません。</p>
+<button type="button" id="start-tour">練習を始める</button> <button type="button" id="restart-tour" hidden>最初から</button>
+<div id="tour" hidden><p id="tour-hint" role="status"></p><button type="button" id="tour-target" aria-describedby="tour-hint"></button><div class="tour-controls">{% for id,text in [('prev','戻る'),('next','次へ'),('skip','スキップ'),('end','終了')] %}<button type="button" id="tour-{{id}}">{{text}}</button>{% endfor %}</div></div></section>
+<section id="faq"><h2>よくある質問</h2>
+{% for q,a in [
+('アカウント登録は必要ですか？','登録せずに投稿を読んだり、質問や回答を書いたりできます。'),
+('匿名で投稿できますか？','ニックネームを使えます。空欄で送ると「名無し」と表示されます。'),
+('投稿した画像は誰でも見られますか？','はい。掲示板を閲覧できる人は、投稿の詳細画面から画像を見ることができます。'),
+('自分の投稿を削除できますか？','はい。投稿したブラウザで詳細を開き、「投稿を削除」から「削除を確定する」を選びます。'),
+('投稿ができないときは？','タイトルと本文の入力、文字数、画像形式と容量を確認してください。連続送信の表示が出たら10秒待ちます。サービスを利用できないと表示された場合は、時間をおいて開き直してください。'),
+('不適切な投稿を見つけたら？','投稿の詳細で「通報する」を押すと記録されます。'),
+('端末やブラウザを変えても、自分の投稿を管理できますか？','投稿者の確認には投稿時のブラウザに保存された情報（Cookie）を使います。別の端末やブラウザに管理権限は引き継がれません。Cookieを削除した場合も同じです。')
+] %}<details><summary>{{q}}</summary><p>{{a}}</p></details>{% endfor %}</section>
+<a href="/">掲示板に戻る →</a></div>
+{% endblock %}
