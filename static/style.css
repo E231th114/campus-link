@@ -15,8 +15,8 @@ a { color: inherit; text-underline-offset: 3px }
 header { position: sticky; top: 0; z-index: 5; background: white; border-bottom: 1px solid var(--line) }
 .bar, .layout { max-width: 1160px; margin: auto; padding-inline: clamp(16px,4vw,48px) }
 .bar { height: 64px; display: flex; align-items: center; justify-content: space-between }
-.brand { display: inline-flex; align-items: center; gap: 9px; font-size: 20px; letter-spacing: -.055em; font-weight: 650; text-decoration: none }
-.brand img { width: 30px; height: 30px }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-size: 20px; line-height: 1; letter-spacing: -.04em; font-weight: 650; text-decoration: none }
+.brand img { display: block; flex: none; width: 36px; height: 36px }
 .layout { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: clamp(32px,6vw,88px); padding-block: 42px 80px }
 nav { display: grid; align-content: start }
 nav a { display: flex; align-items: center; gap: 8px; color: var(--muted); padding: 7px 10px; min-height: 40px; text-decoration: none; font-size: 14px }
@@ -70,6 +70,8 @@ main > a:first-child { display: inline-block; margin-bottom: 14px; font-size: 14
 .skip:focus { top: 4px }
 @media(max-width:760px) {
   .bar { height: 58px }
+  .brand { gap: 7px }
+  .brand img { width: 34px; height: 34px }
   .layout { display: block; padding-block: 0 54px }
   nav { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--line) }
   nav small { display: none }
