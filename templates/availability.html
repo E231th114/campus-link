@@ -1,0 +1,1 @@
+<span data-availability="{{p.deadline or 0}}" data-fixed="{{ '1' if p.solved or p.paused else '0' }}"><span data-status>{{p.status}}</span>{% if p.deadline %}<span data-remaining>{% if p.remaining %} · {{p.remaining}}{% endif %}</span>{% endif %}</span>

@@ -24,6 +24,10 @@ class Local:
             result = db.execute("INSERT OR IGNORE INTO rows VALUES (?,?,?)", (part, key, json.dumps(data)))
             return bool(result.rowcount)
 
+    def put(self, part, key, data):
+        with closing(sqlite3.connect(self.db)) as db, db:
+            db.execute("INSERT OR REPLACE INTO rows VALUES (?,?,?)", (part, key, json.dumps(data)))
+
     def rows(self, part):
         with closing(sqlite3.connect(self.db)) as db:
             return [dict(json.loads(data), RowKey=key) for key, data in
@@ -56,6 +60,9 @@ class Azure:
             return True
         except ResourceExistsError:
             return False
+
+    def put(self, part, key, data):
+        self.table.upsert_entity(dict(data, PartitionKey=part, RowKey=key))
 
     def rows(self, part):
         return list(self.table.query_entities("PartitionKey eq @part", parameters={"part": part}))

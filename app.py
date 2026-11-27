@@ -13,6 +13,7 @@ from azure.core.exceptions import AzureError
 from flask import Flask, abort, flash, redirect, render_template, request, send_file, session, url_for
 from PIL import Image, ImageOps, UnidentifiedImageError
 
+from services.discussion import EMOJI, availability, parse_deadline, reaction_state
 from services.store import Azure, Local
 
 CATEGORIES = ("勉強", "課題", "進路", "部活動", "相談", "雑談")
@@ -87,11 +88,16 @@ def board():
     posts = [p for p in storage().rows("board") if p["RowKey"] not in deleted]
     counts = {part: Counter(row["post"] for row in storage().rows(part))
               for part in ("comment", "like", "resolved")}
+    settings = {r["RowKey"]: r for r in storage().rows("deadlines")}
+    now = int(time.time())
     for p in posts:
         key = p["RowKey"]
         p.setdefault("title", p["text"][:50])
         p.setdefault("category", "雑談")
         p.update(answers=counts["comment"][key], likes=counts["like"][key], solved=bool(counts["resolved"][key]))
+        if key in settings:
+            p.update(deadline=settings[key]["deadline"], paused=settings[key]["paused"])
+        availability(p, now)
     return posts
 
 
@@ -103,7 +109,7 @@ def index():
     rows = [p for p in posts if (not category or p["category"] == category)
             and (request.args.get("view") != "mine" or p.get("owner") == session["owner"])
             and query in (p["title"] + " " + p["text"]).casefold()
-            and (not request.args.get("unanswered") or not p["answers"] and not p["solved"])]
+            and (not request.args.get("unanswered") or not p["answers"] and p["accepting"])]
     popular = request.args.get("sort") == "popular"
     rows.sort(key=lambda p: (p["likes"] if popular else 0, p["posted_at"], p["RowKey"]), reverse=True)
     return render_template("index.html", posts=rows, categories=CATEGORIES, category=category)
@@ -148,13 +154,14 @@ def post():
     category = field("category", 8, "雑談")
     if category not in CATEGORIES:
         abort(400)
+    deadline = requested_deadline()
     image = uploaded_image()
     rate_limit()
     key = str(uuid.uuid4())
     if image:
         storage().picture(key, image)
     storage().add("board", key, dict(title=title, name=name, text=body, category=category,
-                                    owner=session["owner"], posted_at=timestamp(), image=bool(image)))
+                                    deadline=deadline, owner=session["owner"], posted_at=timestamp(), image=bool(image)))
     flash("投稿を公開しました。", "posted")
     return redirect(url_for("detail", key=key), 303)
 
@@ -168,7 +175,60 @@ def detail(key):
     p = find_post(key)
     comments = sorted((r for r in storage().rows("comment") if r["post"] == str(key)),
                       key=lambda r: (r["posted_at"], r["RowKey"]))
-    return render_template("detail.html", p=p, comments=comments)
+    return render_template("detail.html", p=p, comments=comments, emoji=EMOJI,
+                           reactions=reaction_state(storage(), str(key), session["owner"]))
+
+
+def requested_deadline():
+    try:
+        return parse_deadline(request.form.get("deadline_mode", "none"),
+                              request.form.get("deadline_custom", ""), int(time.time()))
+    except (ValueError, OverflowError, OSError):
+        abort(400)
+
+
+@app.post("/p/<uuid:key>/deadline")
+def deadline_settings(key):
+    post = find_post(key)
+    if post.get("owner") != session["owner"]:
+        abort(403)
+    operation = request.form.get("operation")
+    if operation not in ("pause", "set"):
+        abort(400)
+    end = post.get("deadline", 0) if operation == "pause" else requested_deadline()
+    storage().put("deadlines", str(key), {"deadline": end, "paused": operation == "pause"})
+    flash("受付設定を更新しました。")
+    return redirect(url_for("detail", key=key), 303)
+
+
+@app.post("/p/<uuid:key>/emoji")
+def emoji_change(key):
+    find_post(key)
+    key = str(key)
+    code = request.form.get("emoji", "")
+    active = request.form.get("active")
+    revision = request.form.get("revision", type=int)
+    if code not in EMOJI or active not in ("0", "1") or revision is None or revision < 0:
+        abort(400)
+    owner = session["owner"]
+    state = reaction_state(storage(), key, owner)
+    current = state[code]
+    # Apply desired membership only against the version the user actually saw.
+    if current["revision"] == revision and current["mine"] != (active == "1"):
+        address = (request.remote_addr or "").encode()
+        digest = hmac.new(app.secret_key.encode(), address, hashlib.sha256).hexdigest()
+        window = int(time.time()) // 10
+        for slot in range(16):
+            if storage().add("emoji-rate", f"{window}-{digest}-{slot}", {}):
+                break
+        else:
+            abort(429)
+        storage().add("emoji-" + key, f"{owner}-{code}-{revision+1}", {
+            "owner": owner, "emoji": code, "revision": revision+1, "active": active == "1",
+            "created": int(time.time()),
+        })
+        state = reaction_state(storage(), key, owner)
+    return state
 
 
 @app.post("/p/<uuid:key>/<action>")
@@ -177,7 +237,7 @@ def act(key, action):
     key = str(key)
     data = {"post": key}
     if action == "comment":
-        if p["solved"]:
+        if not p["accepting"]:
             abort(409)
         data.update(text=field("message", 2000), name=field("name", 24, "名無し"), posted_at=timestamp())
         row = str(uuid.uuid4())
@@ -190,6 +250,8 @@ def act(key, action):
     else:
         abort(404)
     rate_limit()
+    if action == "comment" and p.get("deadline") and time.time() >= p["deadline"]:
+        abort(409)
     added = storage().add(action, row, data)
     if action == "deleted":
         flash("投稿を削除しました。")

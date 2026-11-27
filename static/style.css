@@ -136,3 +136,20 @@ main > a:first-child { display: inline-block; margin-bottom: 14px; font-size: 14
 .help-link { justify-content:center; width:44px }
 .guide-nav-link { margin:16px 10px; font-size:14px }
 @media(max-width:760px){.guide-nav-link{display:none}}
+
+.emoji-bar,.emoji-grid { display:flex; flex-wrap:wrap; align-items:center; gap:8px }
+.emoji-bar { margin-block:18px 6px }
+.emoji-bar button { min-height:44px; min-width:44px }
+.emoji-bar [aria-pressed=true] { outline:1px solid currentColor; outline-offset:-1px }
+.emoji-bar [aria-pressed=true]::after { content:'✓'; font-size:12px }
+.emoji-bar[aria-busy=true] { opacity:.65 }
+#emoji-picker { position:fixed; inset:auto; margin:0; width:300px; max-width:100%; max-height:85dvh; padding:16px; border:1px solid var(--line); color:var(--ink) }
+#emoji-picker h2 { font-size:16px; margin:0 }
+#emoji-picker::backdrop { background:transparent }
+.emoji-grid { display:grid; grid-template-columns:repeat(4,1fr); margin-top:12px }
+.emoji-grid button { font-size:20px }
+@media(max-width:760px){
+  #emoji-picker { inset:auto 0 0; width:100%; padding-bottom:calc(16px + env(safe-area-inset-bottom)); border:0 }
+  #emoji-picker::backdrop { background:rgb(0 0 0 / .32) }
+  .emoji-open,.emoji-open body { overflow:hidden; overscroll-behavior:none }
+}

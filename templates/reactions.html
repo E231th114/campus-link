@@ -1,0 +1,8 @@
+<div class="emoji-bar" data-api="{{url_for('emoji_change',key=p.RowKey)}}" data-csrf="{{session.csrf}}">
+<button type="button" id="emoji-open" aria-haspopup="dialog">＋ リアクション</button>
+{% for code,(glyph,label) in emoji.items() %}
+<button type="button" class="emoji-chip" data-code="{{code}}" aria-label="{{label}} {{reactions[code].count}}件" aria-pressed="{{ 'true' if reactions[code].mine else 'false' }}" {% if not reactions[code].count %}hidden{% endif %}>{{glyph}} <span>{{reactions[code].count}}</span></button>
+{% endfor %}
+<dialog id="emoji-picker" aria-labelledby="emoji-title"><div class="sheet-heading"><h2 id="emoji-title">リアクションを選択</h2><button type="button" id="emoji-close">閉じる</button></div>
+<div class="emoji-grid">{% for code,(glyph,label) in emoji.items() %}<button type="button" data-code="{{code}}" data-revision="{{reactions[code].revision}}" data-label="{{label}}" aria-label="{{label}}" title="{{label}}" aria-pressed="{{ 'true' if reactions[code].mine else 'false' }}">{{glyph}}</button>{% endfor %}</div></dialog>
+</div><small role="status" id="emoji-feedback"></small>

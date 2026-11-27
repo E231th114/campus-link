@@ -30,6 +30,13 @@ document.addEventListener('submit', event => {
   }
   form.dataset.pending = 'true';
   if (event.submitter) {
+    if (event.submitter.name) {
+      const operation = document.createElement('input');
+      operation.type = 'hidden';
+      operation.name = event.submitter.name;
+      operation.value = event.submitter.value;
+      form.append(operation);
+    }
     event.submitter.disabled = true;
     event.submitter.textContent = '処理中…';
   }
@@ -55,7 +62,7 @@ if (document.querySelector('[data-result="answered"]')) {
 }
 const editor = document.querySelector('[data-draft]');
 if (editor) {
-  const fields = [...editor.querySelectorAll('[maxlength], select[name=category]')];
+  const fields = [...editor.querySelectorAll('[maxlength], select[name=category], [name=deadline_mode], [name=deadline_custom]')];
   const saved = tabState.read(editor.dataset.draft);
   for (const field of fields) {
     if (typeof saved?.[field.name] === 'string') field.value = saved[field.name];

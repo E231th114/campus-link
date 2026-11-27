@@ -1,0 +1,4 @@
+<label>回答期限<select name="deadline_mode">
+{% for value,label in [('none','期限なし'),('1h','1時間後'),('24h','24時間後'),('3d','3日後'),('1w','1週間後'),('custom','日時を指定')] %}<option value="{{value}}">{{label}}</option>{% endfor %}
+</select></label>
+<label data-custom-date>締め切り日時（日本時間）<input type="datetime-local" name="deadline_custom"></label>

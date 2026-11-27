@@ -10,7 +10,9 @@ const steps = [
   ['すべての投稿', 'カテゴリ選択を開いてみましょう。', 'カテゴリ一覧が開きました。'],
   ['勉強', '質問を勉強カテゴリに絞りましょう。', '勉強カテゴリの質問が表示されました。'],
   ['定期テストの復習は何から始める？', 'タイトルを押して質問の詳細を読みましょう。', '「みんなの復習方法を教えてください。」という本文が開きました。'],
-  ['参考になった 0', '役に立ったことを伝えてみましょう。', '「参考になった」が1件になりました。']
+  ['参考になった 0', '役に立ったことを伝えてみましょう。', '「参考になった」が1件になりました。'],
+  ['24時間後', '回答期限を設定する練習です。「24時間後」を押しましょう。', '締め切りが投稿の24時間後に設定されました。'],
+  ['❤️ 共感した', '絵文字を選んで共感を伝えましょう。', '自分の絵文字にチェックが付きました。実際の投稿には記録されません。']
 ];
 const get = id => document.getElementById(id);
 const progressKey = 'campus:guide-practice';
@@ -50,6 +52,7 @@ get('restart-tour').onclick = () => { step = 0; start(); };
 get('tour-target').onclick = () => {
   get('tour-hint').textContent = (step + 1) + ' / ' + steps.length + '　' + steps[step][2];
   if (step === 3) get('tour-target').textContent = '参考になった 1';
+  if (step === 5) get('tour-target').textContent = '❤️ 1 ✓';
   get('tour-target').disabled = true;
   get('tour-next').focus();
 };
