@@ -40,6 +40,6 @@
 | 画像 | JPEG・PNGを添付して詳細で表示 | 発展 |
 | Azure連携 | Tableに投稿・回答、非公開Blobに画像を保存する構成 | 発展 |
 
-サイトのURL：https://ih12a19-00-g2asgpfbhxc9guga.eastasia-01.azurewebsites.net/（App Service初期Welcomeページを確認。Campus Link公開は未確認）
+サイトのURL：https://kind-flower-0de1ec400.8.azurestaticapps.net/（Azure Static Web Apps / Free / 静的プレビュー）
 
 GitHubリポジトリのURL：https://github.com/E231th114/campus-link
